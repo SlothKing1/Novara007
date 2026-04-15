@@ -85,6 +85,14 @@ class BaseAdapter(abc.ABC):
     # Base URL of the source site.
     BASE_URL: str
 
+    # Requests per second for this source (overrides global setting).
+    REQUESTS_PER_SECOND: float = 1.0
+
+    # Set True for sites that require cloudscraper on the first request
+    # (known Cloudflare sites). For most sites leave False — the HTTP client
+    # will fall back automatically on 403/503.
+    NEEDS_CLOUDSCRAPER: bool = False
+
     @abc.abstractmethod
     async def scrape_title(self, source_url: str) -> RawMetadata:
         """Scrape and return the metadata from a novel's title page.

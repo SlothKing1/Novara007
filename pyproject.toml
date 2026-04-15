@@ -33,6 +33,8 @@ dependencies = [
     # Task queue
     "celery[redis]>=5.4.0",
     "redis>=5.2.0",
+    # Cloudflare bypass
+    "cloudscraper>=1.2.71",
     # Utilities
     "python-slugify>=8.0.4",
     "structlog>=24.4.0",
