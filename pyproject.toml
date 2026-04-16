@@ -33,8 +33,9 @@ dependencies = [
     # Task queue
     "celery[redis]>=5.4.0",
     "redis>=5.2.0",
-    # Cloudflare bypass
+    # Cloudflare bypass (tier 2: cloudscraper, tier 3: curl_cffi TLS fingerprint)
     "cloudscraper>=1.2.71",
+    "curl-cffi>=0.7.0",
     # Utilities
     "python-slugify>=8.0.4",
     "structlog>=24.4.0",

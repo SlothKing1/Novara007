@@ -16,6 +16,7 @@ the admin API.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 import structlog
@@ -30,6 +31,30 @@ log = structlog.get_logger(__name__)
 
 # Title similarity threshold to consider a match (0–100)
 DEFAULT_MATCH_THRESHOLD = 90.0
+
+# Stop words removed during aggressive normalisation
+_STOP_WORDS = frozenset({
+    "the", "a", "an", "of", "in", "to", "is", "it", "as",
+    "and", "or", "for", "on", "with", "at", "by", "from",
+    "i", "ii", "iii", "iv",
+    # common web-novel title noise
+    "novel", "light", "manga", "manhwa", "manhua", "webtoon",
+    "omniscient", "reader", "viewpoint", "view", "point",
+})
+
+
+def _normalise_for_matching(title: str) -> str:
+    """Aggressive title normalisation for fuzzy comparison.
+
+    Lowercases, strips punctuation, removes stop words so that titles like
+    "The Legendary Moonlight Sculptor" and "Legendary Moonlight Sculptor"
+    resolve to the same comparison string.
+
+    Ported from Max-System-novara-project-1 / scraper_v2/core/ingest.py.
+    """
+    t = re.sub(r"[^a-z0-9\s]", "", title.lower())
+    words = [w for w in t.split() if w and w not in _STOP_WORDS]
+    return " ".join(words)
 
 
 @dataclass
@@ -172,11 +197,12 @@ class WorkMatcher:
         best_work: Work | None = None
         best_score = 0.0
 
+        norm_candidate = _normalise_for_matching(candidate_title)
         for work in all_works:
             if not work.title:
                 continue
             score = fuzz.token_sort_ratio(
-                candidate_title.lower(), work.title.lower()
+                norm_candidate, _normalise_for_matching(work.title)
             )
             if score > best_score:
                 best_score = float(score)

@@ -116,11 +116,17 @@ async def fetch_with_retry(
 
             if response.status_code in _BLOCKED_CODES:
                 log.info(
-                    "http_blocked_falling_back_to_cloudscraper",
+                    "http_blocked_falling_back",
                     url=url,
                     status=response.status_code,
                 )
-                return await _fetch_cloudscraper(url)
+                # Tier 2: cloudscraper
+                cs_response = await _fetch_cloudscraper(url)
+                if cs_response.status_code not in _BLOCKED_CODES:
+                    return cs_response
+                # Tier 3: curl_cffi (stronger TLS fingerprint)
+                log.info("cloudscraper_blocked_trying_curl_cffi", url=url)
+                return await _fetch_curl_cffi(url)
 
             response.raise_for_status()
             return response
@@ -180,4 +186,36 @@ def _cs_get(url: str) -> _CloudscraperResponse:
     scraper.headers.update({"User-Agent": settings.http_user_agent})
     resp = scraper.get(url, timeout=settings.http_timeout)
     log.debug("cloudscraper_fetch", url=url, status=resp.status_code)
+    return _CloudscraperResponse(resp)
+
+
+# ── curl_cffi fallback (tier 3) ──────────────────────────────────────────────
+
+async def _fetch_curl_cffi(url: str) -> _CloudscraperResponse:
+    """Run curl_cffi in a threadpool executor.
+
+    curl_cffi impersonates a real browser's TLS fingerprint, bypassing
+    Cloudflare protections that defeat cloudscraper.  Only attempted when
+    cloudscraper itself returns a blocked status code.
+    """
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, functools.partial(_ccffi_get, url))
+
+
+def _ccffi_get(url: str) -> _CloudscraperResponse:
+    """Synchronous curl_cffi fetch — called from threadpool."""
+    try:
+        from curl_cffi import requests as curl_req  # type: ignore[import]
+    except ImportError as e:
+        raise ImportError(
+            "curl_cffi is not installed. Run: pip install curl-cffi"
+        ) from e
+
+    resp = curl_req.get(
+        url,
+        timeout=settings.http_timeout,
+        impersonate="chrome120",
+        headers={"User-Agent": settings.http_user_agent},
+    )
+    log.debug("curl_cffi_fetch", url=url, status=resp.status_code)
     return _CloudscraperResponse(resp)
