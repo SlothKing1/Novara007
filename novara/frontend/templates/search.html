@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search — Novara</title>
+  <meta property="og:title" content="Novara — Read Light Novels Free">
+  <meta property="og:description" content="Search thousands of light novels and web novels.">
+  <meta property="og:type" content="website">
+<link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+<nav class="navbar">
+  <a href="/" class="navbar-brand">Novara<span>.</span></a>
+  <div class="navbar-search">
+    <span class="si">🔍</span>
+    <input type="text" id="navSearch" placeholder="Search novels..." autocomplete="off">
+    <div class="search-dropdown" id="searchDropdown"></div>
+  </div>
+  <div class="navbar-links">
+    <a href="/">Home</a><a href="/browse">Browse</a><a href="/search" class="active">Search</a>
+  </div>
+  <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+</nav>
+<div class="overlay" id="overlay"></div>
+<nav class="mobile-nav" id="mobileNav">
+  <div class="mobile-nav-header"><span class="navbar-brand">Novara<span>.</span></span><span class="mobile-nav-close" id="navClose">✕</span></div>
+  <div class="mobile-nav-links"><a href="/">🏠 Home</a><a href="/browse">📚 Browse</a><a href="/search">🔍 Search</a></div>
+</nav>
+<div class="container search-page">
+  <div class="search-header">
+    <h1>Advanced Search</h1>
+    <div class="search-bar-lg">
+      <span class="si">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search by title, author..." value="{{ query or '' }}">
+    </div>
+  </div>
+  <div class="filters-panel">
+    <div class="filters-toggle" id="filtersToggle">
+      <span>🔧 Filters <span id="activeFilterCount" style="color:var(--accent);font-size:.8rem"></span></span>
+      <span id="filtersArrow">▼</span>
+    </div>
+    <div class="filters-grid" id="filtersBody">
+      <div class="filter-group"><label>Status</label><select class="filter-select" id="fStatus"><option value="">Any</option><option value="ongoing">Ongoing</option><option value="completed">Completed</option></select></div>
+      <div class="filter-group"><label>Language</label><select class="filter-select" id="fLang"><option value="">Any</option><option value="zh">Chinese</option><option value="ko">Korean</option><option value="jp">Japanese</option></select></div>
+      <div class="filter-group"><label>Sort By</label><select class="filter-select" id="fSort"><option value="popular">Most Popular</option><option value="updated">Recently Updated</option><option value="new">Newest</option><option value="rating">Highest Rated</option><option value="chapters">Most Chapters</option><option value="az">A → Z</option></select></div>
+      <div class="filter-group"><label>Min Rating</label><select class="filter-select" id="fRating"><option value="">Any</option><option value="4.5">4.5+</option><option value="4.0">4.0+</option><option value="3.5">3.5+</option></select></div>
+      <div class="filter-group"><label>Chapters</label><div class="filter-range"><input type="number" id="fChapMin" placeholder="Min"><span>–</span><input type="number" id="fChapMax" placeholder="Max"></div></div>
+      <div class="filter-group"><label>Exclude Tags</label><div class="filter-tags-wrap" id="excludeTags"></div></div>
+    </div>
+    <div style="margin-top:1rem">
+      <label style="display:block;font-size:.75rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.5rem">Include Tags</label>
+      <div class="filter-tags-wrap" id="includeTags"></div>
+    </div>
+    <div class="filters-actions">
+      <button class="btn-filter" id="applyFilters">Search</button>
+      <button class="btn-reset" id="resetFilters">Reset</button>
+    </div>
+  </div>
+  <div class="results-header">
+    <span class="results-count" id="resultsCount">Loading...</span>
+    <select class="sort-select" id="sortSelect"><option value="popular">Most Popular</option><option value="updated">Recently Updated</option><option value="new">Newest</option><option value="rating">Highest Rated</option><option value="chapters">Most Chapters</option><option value="az">A → Z</option></select>
+  </div>
+  <div class="novel-grid novel-grid-lg" id="searchResults"></div>
+  <div class="pagination" id="pagination"></div>
+</div>
+<footer class="footer">
+  <div class="footer-grid">
+    <div><div class="footer-brand">Novara<span>.</span></div><p class="footer-desc">Read thousands of light novels online free.</p></div>
+    <div class="footer-col"><h4>Browse</h4><a href="/browse">All Novels</a><a href="/browse?status=completed">Completed</a></div>
+    <div class="footer-col"><h4>Account</h4><a href="#" onclick="toast('Coming soon!','info');return false;">Register</a></div>
+    <div class="footer-col"><h4>Info</h4><a href="#" onclick="toast('Coming soon!','info');return false;">About</a><a href="#" onclick="toast('Coming soon!','info');return false;">DMCA</a></div>
+  </div>
+  <div class="footer-bottom"><p>© 2025 Novara. All rights belong to respective authors.</p></div>
+</footer>
+<button class="back-to-top" id="backToTop">↑</button>
+<div class="toast-container" id="toastContainer"></div>
+<script src="/static/js/main.js"></script>
+<script src="/static/js/search.js"></script>
+</body>
+</html>

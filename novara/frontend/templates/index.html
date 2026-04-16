@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Novara — Read Light Novels Online Free</title>
+<link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+<nav class="navbar">
+  <a href="/" class="navbar-brand">Novara<span>.</span></a>
+  <div class="navbar-search">
+    <span class="si">🔍</span>
+    <input type="text" id="navSearch" placeholder="Search novels, authors..." autocomplete="off">
+    <div class="search-dropdown" id="searchDropdown"></div>
+  </div>
+  <div class="navbar-links">
+    <a href="/" class="active">Home</a>
+    <a href="/browse">Browse</a>
+    <a href="/search">Search</a>
+    <a href="#" onclick="toast('Coming soon!','info');return false;" class="btn-login">Sign In</a>
+  </div>
+  <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+</nav>
+<div class="overlay" id="overlay"></div>
+<nav class="mobile-nav" id="mobileNav">
+  <div class="mobile-nav-header">
+    <span class="navbar-brand">Novara<span>.</span></span>
+    <span class="mobile-nav-close" id="navClose">✕</span>
+  </div>
+  <div class="mobile-nav-links">
+    <a href="/">🏠 Home</a>
+    <a href="/browse">📚 Browse</a>
+    <a href="/search">🔍 Search</a>
+    <a href="#" onclick="toast('Coming soon!','info');return false;">👤 Sign In</a>
+  </div>
+</nav>
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <h1>Your <em>universe</em> of stories, one page at a time.</h1>
+      <p>Thousands of light novels and web novels. Read free, track your progress, discover your next obsession.</p>
+      <div class="hero-actions">
+        <a href="/browse" class="btn-primary">▶ Start Reading</a>
+        <a href="/search" class="btn-secondary">🔍 Advanced Search</a>
+      </div>
+      <div class="hero-stats">
+        <div><div class="hero-stat-num" id="statNovels">2,700+</div><div class="hero-stat-label">Novels</div></div>
+        <div><div class="hero-stat-num" id="statChapters">1M+</div><div class="hero-stat-label">Chapters</div></div>
+        <div><div class="hero-stat-num">Free</div><div class="hero-stat-label">Always</div></div>
+      </div>
+    </div>
+    <div class="hero-featured" id="heroFeatured">
+      <div class="hero-card skeleton" style="grid-row:span 2"></div>
+      <div class="hero-card skeleton"></div>
+      <div class="hero-card skeleton"></div>
+      <div class="hero-card skeleton"></div>
+    </div>
+  </div>
+</section>
+<div class="ad-banner"><span class="ad-label">Advertisement</span><div class="ad-placeholder">728×90 Banner Ad</div></div>
+<div class="container">
+  <div class="adblock-notice" id="adblockNotice">
+    <span class="ab-icon">📖</span>
+    <div class="ab-text"><strong>Please consider disabling your ad blocker</strong>Ads keep Novara free for everyone. No pop-ups, no autoplay video.</div>
+    <span class="ab-close" onclick="this.parentElement.classList.remove('show')">✕</span>
+  </div>
+</div>
+<div class="container">
+  <section class="section">
+    <div class="section-header"><h2 class="section-title">Recently Updated</h2><a href="/browse?sort=updated" class="section-link">View all →</a></div>
+    <div class="scroll-row wide" id="recentlyUpdated">
+      <div class="novel-card"><div class="novel-card-cover skeleton"></div><div class="skeleton" style="height:14px;width:90%;margin-bottom:4px"></div><div class="skeleton" style="height:11px;width:60%"></div></div>
+      <div class="novel-card"><div class="novel-card-cover skeleton"></div><div class="skeleton" style="height:14px;width:90%;margin-bottom:4px"></div><div class="skeleton" style="height:11px;width:60%"></div></div>
+      <div class="novel-card"><div class="novel-card-cover skeleton"></div><div class="skeleton" style="height:14px;width:90%;margin-bottom:4px"></div><div class="skeleton" style="height:11px;width:60%"></div></div>
+      <div class="novel-card"><div class="novel-card-cover skeleton"></div><div class="skeleton" style="height:14px;width:90%;margin-bottom:4px"></div><div class="skeleton" style="height:11px;width:60%"></div></div>
+      <div class="novel-card"><div class="novel-card-cover skeleton"></div><div class="skeleton" style="height:14px;width:90%;margin-bottom:4px"></div><div class="skeleton" style="height:11px;width:60%"></div></div>
+      <div class="novel-card"><div class="novel-card-cover skeleton"></div><div class="skeleton" style="height:14px;width:90%;margin-bottom:4px"></div><div class="skeleton" style="height:11px;width:60%"></div></div>
+    </div>
+  </section>
+</div>
+<div class="container">
+  <section class="section" style="padding-top:0">
+    <div class="section-header"><h2 class="section-title">Popular This Week</h2><a href="/browse?sort=popular" class="section-link">Rankings →</a></div>
+    <div class="scroll-row wide" id="popularWeek">
+      <div class="novel-card"><div class="novel-card-cover skeleton"></div><div class="skeleton" style="height:14px;width:90%;margin-bottom:4px"></div><div class="skeleton" style="height:11px;width:60%"></div></div>
+      <div class="novel-card"><div class="novel-card-cover skeleton"></div><div class="skeleton" style="height:14px;width:90%;margin-bottom:4px"></div><div class="skeleton" style="height:11px;width:60%"></div></div>
+      <div class="novel-card"><div class="novel-card-cover skeleton"></div><div class="skeleton" style="height:14px;width:90%;margin-bottom:4px"></div><div class="skeleton" style="height:11px;width:60%"></div></div>
+      <div class="novel-card"><div class="novel-card-cover skeleton"></div><div class="skeleton" style="height:14px;width:90%;margin-bottom:4px"></div><div class="skeleton" style="height:11px;width:60%"></div></div>
+      <div class="novel-card"><div class="novel-card-cover skeleton"></div><div class="skeleton" style="height:14px;width:90%;margin-bottom:4px"></div><div class="skeleton" style="height:11px;width:60%"></div></div>
+      <div class="novel-card"><div class="novel-card-cover skeleton"></div><div class="skeleton" style="height:14px;width:90%;margin-bottom:4px"></div><div class="skeleton" style="height:11px;width:60%"></div></div>
+    </div>
+  </section>
+</div>
+<div class="ad-banner"><span class="ad-label">Advertisement</span><div class="ad-placeholder">728×90 Banner Ad</div></div>
+<div class="container">
+  <section class="section">
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:2rem;align-items:start">
+      <div>
+        <div class="section-header"><h2 class="section-title">Editor's Picks</h2><a href="/browse?sort=rating" class="section-link">More →</a></div>
+        <div class="featured-list" id="editorsPicks">
+          <div class="featured-item"><div class="skeleton featured-item-cover"></div><div style="flex:1"><div class="skeleton" style="height:14px;width:80%;margin-bottom:6px"></div><div class="skeleton" style="height:11px;width:50%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:100%"></div></div></div>
+          <div class="featured-item"><div class="skeleton featured-item-cover"></div><div style="flex:1"><div class="skeleton" style="height:14px;width:80%;margin-bottom:6px"></div><div class="skeleton" style="height:11px;width:50%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:100%"></div></div></div>
+          <div class="featured-item"><div class="skeleton featured-item-cover"></div><div style="flex:1"><div class="skeleton" style="height:14px;width:80%;margin-bottom:6px"></div><div class="skeleton" style="height:11px;width:50%;margin-bottom:8px"></div><div class="skeleton" style="height:11px;width:100%"></div></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="section-header"><h2 class="section-title">Browse Genres</h2></div>
+        <div class="genre-grid">
+          <button class="genre-btn" onclick="location.href='/search?tags=action'"><span class="genre-icon">⚔️</span>Action</button>
+          <button class="genre-btn" onclick="location.href='/search?tags=romance'"><span class="genre-icon">💕</span>Romance</button>
+          <button class="genre-btn" onclick="location.href='/search?tags=fantasy'"><span class="genre-icon">🐉</span>Fantasy</button>
+          <button class="genre-btn" onclick="location.href='/search?tags=xianxia'"><span class="genre-icon">☯️</span>Xianxia</button>
+          <button class="genre-btn" onclick="location.href='/search?tags=wuxia'"><span class="genre-icon">🥋</span>Wuxia</button>
+          <button class="genre-btn" onclick="location.href='/search?tags=harem'"><span class="genre-icon">👑</span>Harem</button>
+          <button class="genre-btn" onclick="location.href='/search?tags=drama'"><span class="genre-icon">🎭</span>Drama</button>
+          <button class="genre-btn" onclick="location.href='/search?tags=mystery'"><span class="genre-icon">🔍</span>Mystery</button>
+          <button class="genre-btn" onclick="location.href='/search?tags=sci-fi'"><span class="genre-icon">🚀</span>Sci-Fi</button>
+          <button class="genre-btn" onclick="location.href='/search?tags=horror'"><span class="genre-icon">👻</span>Horror</button>
+          <button class="genre-btn" onclick="location.href='/search?tags=psychological'"><span class="genre-icon">🧠</span>Psychological</button>
+          <button class="genre-btn" onclick="location.href='/search?tags=martial arts'"><span class="genre-icon">🏯</span>Martial Arts</button>
+        </div>
+        <div class="ad-banner" style="margin-top:1.5rem;border-radius:var(--radius);border:1px solid var(--border)"><span class="ad-label">Advertisement</span><div class="ad-placeholder">300×250</div></div>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="container">
+  <section class="section" style="padding-top:0">
+    <div class="section-header"><h2 class="section-title">Completed Series</h2><a href="/browse?status=completed" class="section-link">View all →</a></div>
+    <div class="scroll-row wide" id="completedNovels">
+      <div class="novel-card"><div class="novel-card-cover skeleton"></div><div class="skeleton" style="height:14px;width:90%;margin-bottom:4px"></div><div class="skeleton" style="height:11px;width:60%"></div></div>
+      <div class="novel-card"><div class="novel-card-cover skeleton"></div><div class="skeleton" style="height:14px;width:90%;margin-bottom:4px"></div><div class="skeleton" style="height:11px;width:60%"></div></div>
+      <div class="novel-card"><div class="novel-card-cover skeleton"></div><div class="skeleton" style="height:14px;width:90%;margin-bottom:4px"></div><div class="skeleton" style="height:11px;width:60%"></div></div>
+      <div class="novel-card"><div class="novel-card-cover skeleton"></div><div class="skeleton" style="height:14px;width:90%;margin-bottom:4px"></div><div class="skeleton" style="height:11px;width:60%"></div></div>
+      <div class="novel-card"><div class="novel-card-cover skeleton"></div><div class="skeleton" style="height:14px;width:90%;margin-bottom:4px"></div><div class="skeleton" style="height:11px;width:60%"></div></div>
+      <div class="novel-card"><div class="novel-card-cover skeleton"></div><div class="skeleton" style="height:14px;width:90%;margin-bottom:4px"></div><div class="skeleton" style="height:11px;width:60%"></div></div>
+    </div>
+  </section>
+</div>
+<div class="ad-banner"><span class="ad-label">Advertisement</span><div class="ad-placeholder">728×90 Banner Ad</div></div>
+<footer class="footer">
+  <div class="footer-grid">
+    <div><div class="footer-brand">Novara<span>.</span></div><p class="footer-desc">The best place to read light novels and web novels online for free. Updated daily.</p></div>
+    <div class="footer-col"><h4>Browse</h4><a href="/browse">All Novels</a><a href="/browse?status=completed">Completed</a><a href="/browse?sort=updated">Recently Updated</a></div>
+    <div class="footer-col"><h4>Account</h4><a href="#" onclick="toast('Coming soon!','info');return false;">Sign In</a><a href="#" class="disabled" onclick="toast('Coming soon!','info');return false;">Register</a></div>
+    <div class="footer-col"><h4>Info</h4><a href="#" class="disabled" onclick="toast('Coming soon!','info');return false;">About</a><a href="#" class="disabled" onclick="toast('Coming soon!','info');return false;">DMCA</a><a href="#" onclick="toast('Coming soon!','info');return false;">Privacy</a></div>
+  </div>
+  <div class="footer-bottom"><p>© 2025 Novara. All novels belong to their respective authors.</p></div>
+</footer>
+<button class="back-to-top" id="backToTop">↑</button>
+<div class="toast-container" id="toastContainer"></div>
+<script src="/static/js/main.js"></script>
+<script>
+if(typeof loadHomepage === "function"){loadHomepage();}
+if(typeof detectAdblock === "function"){detectAdblock();}
+</script>
+</body>
+</html>

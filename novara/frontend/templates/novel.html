@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ novel.title }} — Novara</title>
+<meta name="description" content="{{ novel.description[:160] if novel.description else '' }}">
+  <meta property="og:title" content="{{ novel.title }} — Novara">
+  <meta property="og:description" content="{{ novel.description[:160] if novel.description else '' }}">
+  <meta property="og:type" content="book">
+  <meta property="og:image" content="{{ novel.cover_url }}">
+<link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+<nav class="navbar">
+  <a href="/" class="navbar-brand">Novara<span>.</span></a>
+  <div class="navbar-search">
+    <span class="si">🔍</span>
+    <input type="text" id="navSearch" placeholder="Search novels..." autocomplete="off">
+    <div class="search-dropdown" id="searchDropdown"></div>
+  </div>
+  <div class="navbar-links">
+    <a href="/">Home</a><a href="/browse">Browse</a><a href="/search">Search</a>
+  </div>
+  <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+</nav>
+<div class="overlay" id="overlay"></div>
+<nav class="mobile-nav" id="mobileNav">
+  <div class="mobile-nav-header"><span class="navbar-brand">Novara<span>.</span></span><span class="mobile-nav-close" id="navClose">✕</span></div>
+  <div class="mobile-nav-links"><a href="/">🏠 Home</a><a href="/browse">📚 Browse</a><a href="/search">🔍 Search</a></div>
+</nav>
+<div class="container" style="padding-top:1rem;padding-bottom:.5rem">
+  <nav style="font-size:.8rem;color:var(--text3)">
+    <a href="/" style="color:var(--text3)">Home</a> › <a href="/browse" style="color:var(--text3)">Browse</a> › <span style="color:var(--text2)">{{ novel.title }}</span>
+  </nav>
+</div>
+<div class="container novel-detail">
+  <div class="novel-detail-hero">
+    <div class="novel-detail-cover">
+      <img src="{{ novel.cover_url or '/static/img/no-cover.svg' }}" alt="{{ novel.title }}" loading="lazy" onerror="this.src='/static/img/no-cover.svg'">
+    </div>
+    <div class="novel-detail-info">
+      <h1 class="novel-detail-title">{{ novel.title }}</h1>
+      <div class="novel-detail-author">by <a href="/search?q={{ novel.author }}">{{ novel.author or 'Unknown' }}</a></div>
+      <div class="novel-meta-row">
+        <span class="meta-badge {{ 'mb-completed' if novel.status == 'completed' else 'mb-ongoing' }}">{{ '✅ Completed' if novel.status == 'completed' else '🔄 Ongoing' }}</span>
+        <span class="meta-badge mb-chapters">📖 {{ novel.total_chapters or 0 }} Chapters</span>
+        {% if novel.avg_rating %}<span class="meta-badge mb-rating">⭐ {{ "%.1f"|format(novel.avg_rating) }}</span>{% endif %}
+        <span class="meta-badge mb-lang">{% if novel.origin_language == 'zh' %}🇨🇳 Chinese{% elif novel.origin_language == 'ko' %}🇰🇷 Korean{% elif novel.origin_language == 'jp' %}🇯🇵 Japanese{% else %}🌐 Web Novel{% endif %}</span>
+      </div>
+      <div class="novel-tags">{% for tag in tags[:12] %}<a href="/search?tags={{ tag.name }}" class="tag-pill">{{ tag.name }}</a>{% endfor %}</div>
+      <div class="novel-actions">
+        <a href="/novel/{{ novel.slug }}/chapter/1" class="btn-read">▶ Start Reading</a>
+        <button class="btn-lib" id="libraryBtn" onclick="toggleLibrary('{{ novel.id }}')">+ Add to Library</button>
+        <button class="btn-lib" onclick="shareNovel()">🔗 Share</button>
+      </div>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'synopsis')">Synopsis</button>
+    <button class="tab-btn" onclick="switchTab(this,'chapters')">Chapters ({{ novel.total_chapters or 0 }})</button>
+    <button class="tab-btn" onclick="switchTab(this,'reviews')">Reviews ({{ review_count or 0 }})</button>
+    <button class="tab-btn" onclick="switchTab(this,'similar')">Similar</button>
+  </div>
+  <div class="tab-panel active" id="tab-synopsis">
+    {% if novel.description %}
+    <p class="desc-text clamped" id="descText">{{ novel.description }}</p>
+    <button class="btn-expand" id="expandBtn" onclick="expandDesc()">Show more ▼</button>
+    {% else %}<p class="desc-text" style="color:var(--text3)">No description available.</p>{% endif %}
+    <div style="margin-top:1.5rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+      <table style="width:100%;border-collapse:collapse">
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:.75rem 1rem;color:var(--text3);font-size:.82rem;width:40%;font-weight:600">Title</td><td style="padding:.75rem 1rem;font-size:.875rem">{{ novel.title }}</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:.75rem 1rem;color:var(--text3);font-size:.82rem;font-weight:600">Author</td><td style="padding:.75rem 1rem;font-size:.875rem"><a href="/search?q={{ novel.author }}" style="color:var(--accent)">{{ novel.author or 'Unknown' }}</a></td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:.75rem 1rem;color:var(--text3);font-size:.82rem;font-weight:600">Status</td><td style="padding:.75rem 1rem;font-size:.875rem">{{ novel.status|capitalize if novel.status else 'Unknown' }}</td></tr>
+        <tr><td style="padding:.75rem 1rem;color:var(--text3);font-size:.82rem;font-weight:600">Genres</td><td style="padding:.75rem 1rem"><div style="display:flex;flex-wrap:wrap;gap:.3rem">{% for tag in tags[:8] %}<a href="/search?tags={{ tag.name }}" class="tag-pill">{{ tag.name }}</a>{% endfor %}</div></td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="tab-panel" id="tab-chapters">
+    <div class="chapter-list-controls">
+      <span style="font-size:.875rem;font-weight:600">{{ novel.total_chapters or 0 }} Chapters</span>
+      <div class="chapter-search" style="display:flex;gap:.5rem">
+        <input type="text" placeholder="Search chapters..." oninput="filterChapters(this.value)">
+        <button class="btn-secondary" style="padding:.4rem .75rem;font-size:.8rem" onclick="sortChapters()">⇅ Reverse</button>
+      </div>
+    </div>
+    <div class="chapter-list" id="chapterList">
+      {% for ch in chapters %}
+      <div class="chapter-item" onclick="location.href='/novel/{{ novel.slug }}/chapter/{{ ch.chapter_num|int }}'">
+        <span class="ci-num">Ch.{{ ch.chapter_num|int }}</span>
+        <span class="ci-title">{{ ch.title or 'Chapter ' + (ch.chapter_num|int)|string }}</span>
+        <span class="ci-date">{{ ch.created_at.strftime('%b %d') if ch.created_at else '' }}</span>
+      </div>
+      {% else %}
+      <div class="empty-state" style="padding:2rem"><div class="empty-state-icon">📭</div><p style="color:var(--text3)">Chapters coming soon!</p></div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="tab-panel" id="tab-reviews">
+    <div class="review-form">
+      <h3>Write a Review</h3>
+      <div class="star-rating" id="starRating">
+        <span class="star" onclick="setRating(1)">★</span><span class="star" onclick="setRating(2)">★</span><span class="star" onclick="setRating(3)">★</span><span class="star" onclick="setRating(4)">★</span><span class="star" onclick="setRating(5)">★</span>
+      </div>
+      <textarea class="review-textarea" id="reviewText" placeholder="Share your thoughts..."></textarea>
+      <button class="btn-primary" style="font-size:.875rem;padding:.6rem 1.25rem" onclick="submitReview('{{ novel.id }}')">Post Review</button>
+    </div>
+    <div id="reviewsList">
+      {% for review in reviews %}
+      <div class="review-card">
+        <div class="review-header">
+          <div class="reviewer-avatar">{{ review.username[0]|upper if review.username else '?' }}</div>
+          <div><div class="reviewer-name">{{ review.username or 'Anonymous' }}</div><div class="review-date">{{ review.created_at.strftime('%B %d, %Y') if review.created_at else '' }}</div></div>
+          <div class="review-stars" style="margin-left:auto">{{ '★' * review.rating }}{{ '☆' * (5 - review.rating) }}</div>
+        </div>
+        <p class="review-text">{{ review.content }}</p>
+      </div>
+      {% else %}
+      <div class="empty-state"><div class="empty-state-icon">✍️</div><h3>No reviews yet</h3><p>Be the first!</p></div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="tab-panel" id="tab-similar">
+    <div class="novel-grid novel-grid-lg" id="similarNovels"><div class="empty-state"><div class="empty-state-icon">🔍</div><h3>Loading...</h3></div></div>
+  </div>
+</div>
+<footer class="footer">
+  <div class="footer-grid">
+    <div><div class="footer-brand">Novara<span>.</span></div><p class="footer-desc">Read thousands of light novels online free.</p></div>
+    <div class="footer-col"><h4>Browse</h4><a href="/browse">All Novels</a><a href="/browse?status=completed">Completed</a></div>
+    <div class="footer-col"><h4>Account</h4><a href="#" onclick="toast('Coming soon!','info');return false;">Register</a></div>
+    <div class="footer-col"><h4>Info</h4><a href="#" onclick="toast('Coming soon!','info');return false;">About</a><a href="#" onclick="toast('Coming soon!','info');return false;">DMCA</a></div>
+  </div>
+  <div class="footer-bottom"><p>© 2025 Novara. All rights belong to respective authors.</p></div>
+</footer>
+<button class="back-to-top" id="backToTop">↑</button>
+<div class="toast-container" id="toastContainer"></div>
+<script>const NOVEL_ID='{{ novel.id }}';const NOVEL_SLUG="{{ novel.slug }}";const NOVEL_TAGS={{ tags|map(attribute='name')|list|tojson }};</script>
+<script src="/static/js/main.js"></script>
+</body>
+</html>

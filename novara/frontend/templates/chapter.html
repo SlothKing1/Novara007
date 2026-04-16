@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ chapter.title or 'Chapter ' + (chapter.chapter_num|int)|string }} — {{ novel.title }} — Novara</title>
+<meta property="og:title" content="{{ chapter.title or 'Chapter ' ~ (chapter.chapter_num|string) }} — {{ novel.title }}">
+  <meta property="og:description" content="{{ novel.description[:160] if novel.description else '' }}">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="{{ novel.cover_url }}">
+<link rel="stylesheet" href="/static/css/main.css">
+<link rel="stylesheet" href="/static/css/reader.css">
+</head>
+<body class="reader-body">
+<div class="reading-progress"><div class="reading-progress-bar" id="progressBar"></div></div>
+<nav class="reader-nav">
+  <div class="reader-nav-left">
+    <a href="/novel/{{ novel.slug }}" class="reader-back">← <span class="reader-novel-title">{{ novel.title }}</span></a>
+  </div>
+  <div class="reader-nav-center">
+    <div class="reader-chapter-title">{{ chapter.title or 'Chapter ' + (chapter.chapter_num|int)|string }}</div>
+  </div>
+  <div class="reader-nav-right">
+    <button class="reader-icon-btn" onclick="toggleChapterDrawer()" title="Chapter List">☰</button>
+    <div style="position:relative">
+      <button class="reader-icon-btn" onclick="toggleSettings()" title="Settings" id="settingsBtn">⚙</button>
+      <div class="reader-settings" id="readerSettings">
+        <div class="settings-title">Display Settings</div>
+        <div class="settings-row"><label>Font Size</label><div class="font-size-controls"><button class="font-size-btn" onclick="changeFontSize(-1)">A−</button><span class="font-size-display" id="fontSizeDisplay">18px</span><button class="font-size-btn" onclick="changeFontSize(1)">A+</button></div></div>
+        <div class="settings-row"><label>Font</label><div class="font-family-options"><div class="font-opt active" onclick="setFont('serif')" style="font-family:Georgia,serif">Serif</div><div class="font-opt" onclick="setFont('sans')" style="font-family:sans-serif">Sans</div><div class="font-opt" onclick="setFont('mono')" style="font-family:monospace">Mono</div></div></div>
+        <div class="settings-row"><label>Theme</label><div class="theme-options"><div class="theme-opt theme-dark active" onclick="setTheme('dark')">Dark</div><div class="theme-opt theme-sepia" onclick="setTheme('sepia')">Sepia</div><div class="theme-opt theme-light" onclick="setTheme('light')">Light</div></div></div>
+        <div class="settings-row"><label>Line Spacing</label><input type="range" class="line-height-slider" min="1.4" max="2.4" step="0.1" value="1.9" oninput="setLineHeight(this.value)" id="lineSlider"></div>
+        <div class="settings-row"><label>Width</label><input type="range" class="width-slider" min="480" max="900" step="20" value="680" oninput="setWidth(this.value)" id="widthSlider"></div>
+      </div>
+    </div>
+    <button class="reader-icon-btn" onclick="bookmarkChapter()" title="Bookmark" id="bookmarkBtn">🔖</button>
+  </div>
+</nav>
+<div class="reader-wrap" id="readerWrap">
+  <div class="chapter-header">
+    <a href="/novel/{{ novel.slug }}" class="chapter-novel-link">{{ novel.title }}</a>
+    <h1 class="chapter-title-main">{{ chapter.title or 'Chapter ' + (chapter.chapter_num|int)|string }}</h1>
+    <div class="chapter-meta-info">
+      <span>Chapter {{ chapter.chapter_num|int }}</span>
+      <span>·</span>
+      <span>{{ chapter.word_count or 0 }} words</span>
+    </div>
+  </div>
+  <div class="chapter-body" id="chapterBody">
+    {% if chapter.body %}
+      {% for paragraph in chapter.paragraphs %}<p>{{ paragraph }}</p>{% endfor %}
+    {% else %}<p style="color:var(--text3);text-align:center">Chapter content not available yet.</p>{% endif %}
+  </div>
+  <div class="chapter-nav">
+    {% if prev_chapter %}<a href="/novel/{{ novel.slug }}/chapter/{{ prev_chapter.chapter_num|int }}" class="chapter-nav-btn">← Previous</a>{% else %}<button class="chapter-nav-btn" disabled>← Previous</button>{% endif %}
+    <div class="chapter-nav-center"><div style="font-weight:600;font-size:.875rem">Ch. {{ chapter.chapter_num|int }}</div><div style="color:var(--text3);font-size:.75rem">of {{ novel.total_chapters or '?' }}</div></div>
+    {% if next_chapter %}<a href="/novel/{{ novel.slug }}/chapter/{{ next_chapter.chapter_num|int }}" class="chapter-nav-btn next">Next →</a>{% else %}<button class="chapter-nav-btn next" disabled>Next →</button>{% endif %}
+  </div>
+  {% if not next_chapter %}
+  <div class="chapter-end-card">
+    <h3>You've reached the latest chapter!</h3>
+    <p>Add to your library to get notified when new chapters arrive.</p>
+    <button class="btn-primary" onclick="toggleLibrary('{{ novel.id }}')">🔔 Add to Library</button>
+  </div>
+  {% endif %}
+</div>
+<div class="overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="chapter-drawer" id="chapterDrawer">
+  <div class="drawer-header"><span class="drawer-title">Chapter List</span><span class="drawer-close" onclick="closeDrawer()">✕</span></div>
+  <div class="drawer-search"><input type="text" placeholder="Search chapters..." oninput="filterDrawer(this.value)"></div>
+  <div class="drawer-chapters" id="drawerChapters"></div>
+</div>
+<div class="reader-floating" id="floatingControls">
+  {% if prev_chapter %}<a href="/novel/{{ novel.slug }}/chapter/{{ prev_chapter.chapter_num|int }}" class="rf-btn">←</a>{% endif %}
+  <span class="rf-progress" id="floatProgress">0%</span>
+  {% if next_chapter %}<a href="/novel/{{ novel.slug }}/chapter/{{ next_chapter.chapter_num|int }}" class="rf-btn">→</a>{% endif %}
+</div>
+<div class="toast-container" id="toastContainer"></div>
+<script>const NOVEL_SLUG="{{ novel.slug }}";const NOVEL_ID='{{ novel.id }}';const CHAPTER_NUM={{ chapter.chapter_num|int }};const TOTAL_CHAPTERS={{ novel.total_chapters or 0 }};</script>
+<script src="/static/js/main.js"></script>
+<script src="/static/js/reader.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  var body = document.querySelector('.chapter-body');
+  if(body && body.innerText.trim().length < 50){
+    body.innerHTML = '<div style="padding:3rem 1rem;text-align:center"><h2 style="color:var(--text2)">Chapter not available</h2><p style="color:var(--text3)">This chapter may still be processing.</p><button onclick="location.reload()" style="padding:.75rem 1.5rem;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);cursor:pointer">Try Again</button></div>';
+  }
+});
+</script>
+</body>
+</html>
